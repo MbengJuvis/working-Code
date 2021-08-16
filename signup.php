@@ -14,25 +14,30 @@
 				$check=password_verify($this->final['c_pwd'], $password);
 				if ($check == 1) {
 					# code...
-					$query="SELECT * from {$tableName} WHERE Name = '{$this->final['username']}' ";
-					$result=mysqli_query($connect,$query);
+					$query="SELECT * from {$tableName} WHERE Name = ? ";
+					$stmt = mysqli_prepare($connect,$query);
+	                  mysqli_stmt_bind_param($stmt,"s",$this->final['username']);
+	                  mysqli_stmt_execute($stmt);
+	                  $result=mysqli_stmt_get_result($stmt);
 					if(mysqli_num_rows($result) > 0){ //If Username already exists
 				 	echo "<script> alert ('user already exists ,try another Username') </script>";
 				 } else{
-				 	$query="INSERT INTO {$tableName} ( UserID,Name,Email,Password,Contact,Address) VALUES ('','{$this->final['username']}','{$this->final['email']}','{$password}','{$this->final['contact']}','{$this->final['address']}') ";
-					 	$result=mysqli_query($connect,$query);
-
-					 		if ($result) {
+				 	$query="INSERT INTO {$tableName} (Name,Password,Phone,Email,Address) VALUES (?,?,?,?,?) ";
+					 	$stmt = mysqli_prepare($connect,$query);
+					 	mysqli_stmt_bind_param($stmt,"ssiss",$this->final['username'],$password,$this->final['contact'],$this->final['email'],$this->final['address']);
+					 		
+					 		if(mysqli_stmt_execute($stmt)){
 					 		echo "<script> alert ('user succesfully registered') </script>";
 					 		//start Session
 					 		session_start();
 					 		$_SESSION['UserID']=mysqli_insert_id($connect);
+					 		echo $_SESSION['UserID'];
 					 		//header("location:login.php");
 					 		# code...
 					 	}
 					 	else{
 					 		echo "<script> alert ('Sorry an error occurred?') </script>";
-					 		 echo "Error: " . $result . "<br>" . $connect->error;
+					 		 die(mysqli_error($connect));
 					 	}
 				 }
 				
@@ -40,6 +45,7 @@
 
 				}else{
 					echo "<script> alert ('Password and Confrim Password do not Match') </script>";
+					//header("location: ./test.html");
 				}
 
 			}
@@ -54,6 +60,6 @@
 
   $tmp = getData('send','fieldnames');
  $jarvis = new signUp($tmp);
- $jarvis->userSignUp('course','user_info');
+ $jarvis->userSignUp('proguidedb','userinfo');
 
 ?>

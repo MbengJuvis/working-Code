@@ -8,7 +8,7 @@ class login extends loginHandler{
 public function verifyLogin($dbName,$tableName){
 	global $connect;
 if(!mysqli_select_db($connect,$dbName)){  //Selects the db
-		die('Failed:' .mysqli_error() );
+		die('Failed:' .mysqli_error($connect) );
 			}else{
 											
 $query="SELECT  Password,UserID from {$tableName} WHERE Name = ? "; //verify if user name exists
@@ -26,7 +26,7 @@ $result=mysqli_stmt_get_result($stmt);
 				 		   session_start();
 				 			$_SESSION['UserID']=$row['UserID'];
 				 			print_r($_SESSION);
-				 			#header("location:profile.php");	
+				 			header("location: ../profile.php");	
 				 	}
 				 	
 				 else{
@@ -47,6 +47,6 @@ $result=mysqli_stmt_get_result($stmt);
  $tmp = getData('send','fieldnames');
  $log = new login($tmp);
 
- $log->verifyLogin('course','user_info');
+ $log->verifyLogin('proguidedb','userinfo');
 
 ?>
